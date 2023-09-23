@@ -1,0 +1,15 @@
+services:
+  frontend:
+    container_name: core-initiative-frontend
+    image: node:lts-alpine
+    ports:
+      - 8080:8080
+    working_dir: /app
+    volumes:
+      - ./ecommerce:/app
+    entrypoint: yarn serve
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 700M
