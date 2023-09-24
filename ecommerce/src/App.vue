@@ -3,6 +3,17 @@ import { defineComponent } from 'vue'
 import './assets/css/global.css'
 import ProductStar from './components/ProductStar.vue'
 import ProductAction from './components/ProductAction.vue'
+import { getProductById } from './data/fakeStoreApi'
+
+type productType = {
+  id: number;
+  title: string;
+  price: string;
+  category: string;
+  description: string;
+  image: string;
+  rating: number;
+}
 
 export default defineComponent({
   name: 'MainPage',
@@ -10,12 +21,64 @@ export default defineComponent({
   data () {
     return {
       category: 'men',
-      productData: {},
-      isLoading: true
+      productData: {} as productType,
+      isLoading: true,
+      index: 1,
+      products: [] as productType[]
     }
   },
-  mounted () {
-    document.title = 'Mens Casual Slim Fit'
+  watch: {
+    index () {
+      this.getProduct()
+    }
+  },
+  methods: {
+    getProduct () {
+      this.isLoading = true
+
+      // Check in products, if exist use it
+      const resultInProducts = this.products.find((item) => item.id === this.index && (item.category === "men's clothing" || item.category === "women's clothing"))
+      if (resultInProducts !== undefined) {
+        this.category = resultInProducts.category === "men's clothing" ? 'men' : 'women'
+        this.productData = resultInProducts
+        document.title = resultInProducts.title
+        this.isLoading = false
+        return
+      }
+
+      // Else fetch from API
+      getProductById(this.index).then((data) => {
+        // Generate random rating
+        data.rating = Math.round(Math.random() * (5 - 1) + 1)
+
+        this.products.push(data)
+
+        // Don't update product data if category is not men or women, else update it
+        if (data.category !== "men's clothing" && data.category !== "women's clothing") {
+          this.index++
+          document.title = 'Loading'
+        } else {
+          this.category = data.category === "men's clothing" ? 'men' : 'women'
+          this.productData = data
+          document.title = data.title
+          this.isLoading = false
+        }
+      })
+    }
+  },
+  async mounted () {
+    await this.getProduct()
+  },
+  created () {
+    // On first load, check params if exist, set the current index from params
+    let url: string | URL = window.location.href
+    url = new URL(url)
+
+    let id
+    if (url.searchParams.get('id')) {
+      id = url.searchParams.get('id')
+      this.index = parseInt(`${id}`)
+    }
   }
 })
 </script>
@@ -40,8 +103,8 @@ export default defineComponent({
           <hr style="width: 100%; border-color: rgba(0, 0, 0, 20%)" />
           <div class='product__price product__price--loading' />
         <div class="product__actions">
-          <ProductAction category='loading' />
-          <ProductAction category='loading' />
+          <ProductAction category='loading' :disabled="true" />
+          <ProductAction category='loading' :disabled="true" />
         </div>
       </div>
     </div>
@@ -50,35 +113,32 @@ export default defineComponent({
   <div class="product" v-if='productData && !isLoading'>
     <div class="foreground" :class="'foreground--' + category" />
     <div class="product__preview">
-      <img src="./assets/images/product-sample.png" alt="" />
+      <img :src='productData.image' :alt='productData.title' />
     </div>
     <div class="product__information">
       <div>
         <div class="product__heading">
-          <h1 title='Mens Casual Slim Fit' class="product__title" :class="'product__title--' + category">Mens Casual Slim Fit</h1>
+          <h1 :title='productData.title' v-text='productData.title' class="product__title" :class="'product__title--' + category" />
           <div class="product__subtitle">
-            <div title='Product category' class="product__category">men's clothing</div>
+            <div title='Product category' class="product__category" v-text='productData.category' />
             <div class="product__rating">
-              <div title='Product rating' class="product__rating-text">2.9/5</div>
+              <div title='Product rating' class="product__rating-text" v-text='productData.rating' />
               <div class="product__rating-star">
-                <ProductStar :category='category' :variant='"fill"' />
-                <ProductStar :category='category' :variant='"fill"' />
-                <ProductStar :category='category' :variant='"border"' />
-                <ProductStar :category='category' :variant='"border"' />
-                <ProductStar :category='category' :variant='"border"' />
+                <ProductStar :category='category' :variant='"fill"' v-for='(rating, key, index) in productData.rating' :key='index'/>
+                <ProductStar :category='category' :variant='"border"' v-for='(rating, key, index) in (5 - productData.rating)' :key='index'/>
               </div>
             </div>
           </div>
         </div>
         <hr style="border-color: rgba(0, 0, 0, 20%)" />
       </div>
-      <p class="product__description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Esse non necessitatibus sunt quia dolores facilis cupiditate harum soluta unde odit, consequuntur culpa. Fugiat delectus, odio maxime a placeat, natus velit necessitatibus quas voluptate sed minima ex quidem quasi, hic quis cum obcaecati vitae laborum vero tempora tenetur laudantium non exercitationem. Veniam molestias necessitatibus, at hic non porro tempora commodi officiis maxime aliquam assumenda quos explicabo ad voluptatem animi nisi nesciunt nulla doloribus architecto repellat corporis cumque dolorem facere sed. Enim quia quidem dolorem itaque illo fugiat rem, voluptas cum provident, autem architecto perferendis. Error sunt odit, ratione accusantium totam corporis? Inventore maiores adipisci fugit ab molestias deserunt quibusdam voluptatem! Dolorum ut doloribus explicabo culpa autem optio id numquam nihil labore, debitis amet veritatis vitae maxime praesentium rerum quam aliquam dolores accusantium quaerat consequatur, suscipit quos dicta tenetur sequi. Quibusdam nulla et eum laudantium rem cum ipsam eligendi, odio optio delectus nobis illo distinctio id magni! Alias, voluptatum omnis! Minus sequi reprehenderit corporis quibusdam repudiandae rerum eos voluptates, consequatur blanditiis delectus, doloribus optio in beatae inventore id. Vero, soluta hic deserunt esse repellat numquam eum, incidunt dolores illum atque asperiores reprehenderit nihil non exercitationem nemo saepe sunt pariatur nulla est autem harum quam accusantium voluptatibus maxime. In doloribus amet fugiat rerum perferendis sunt vero architecto beatae provident ad ullam, sed sequi magni reiciendis cum fugit obcaecati aut et corrupti nulla, repellendus non expedita reprehenderit totam. Repudiandae modi beatae quibusdam architecto est accusamus explicabo odio minima, iure dolor nulla perspiciatis eligendi maxime magni eaque cupiditate consequuntur saepe fugiat, corrupti aperiam molestias facilis culpa iste? Eum nostrum ratione fuga labore autem, quisquam deleniti soluta est, consequatur eligendi aperiam aliquam voluptas ducimus placeat sint quaerat velit quidem blanditiis sed obcaecati nisi voluptate impedit optio. Ea eveniet architecto vel at natus nemo minima perspiciatis asperiores, nostrum quasi. Ab cum exercitationem laborum deserunt laudantium, quis voluptates rerum necessitatibus iste, delectus dolore corrupti commodi sed laboriosam, numquam alias quibusdam cumque consectetur quam impedit odio. Beatae ullam quam quos, ipsam neque voluptates consequuntur sint cum quisquam animi quis eveniet, vitae tempore temporibus tempora, omnis distinctio aliquid impedit provident ea quo sequi numquam. Laboriosam quasi ea neque officia quo odio consequatur accusantium voluptas, expedita ipsam perspiciatis nulla excepturi praesentium, iusto earum ab atque itaque quam dolore, dicta placeat molestiae rerum soluta. Natus vel consectetur repellat voluptas earum quae magni saepe veritatis. Dolor numquam sit similique sint aliquam sunt repudiandae itaque natus repellendus soluta facere incidunt, totam aspernatur quidem. Autem, ad ipsa odio est iure architecto culpa, dolor, esse illo ea magnam. Eos odio quis, illum officia tempora a sint quae inventore enim aut? Asperiores labore consequuntur sequi, ea dolor distinctio fugit totam exercitationem perspiciatis in iste pariatur quidem repellat. Quibusdam natus quas non perferendis quod dignissimos, nesciunt cupiditate, hic tempore pariatur maxime sit aliquid dolore inventore blanditiis ipsa voluptas officiis culpa. Blanditiis, reiciendis rerum iure ad id voluptate reprehenderit debitis. Odit velit esse modi accusantium reprehenderit atque illo error dolor quas. Fugiat qui tenetur maiores? Atque nulla illum eaque!</p>
+      <p class="product__description" v-text='productData.description' />
       <div class='product__bottom'>
           <hr style="width: 100%; border-color: rgba(0, 0, 0, 20%)" />
-          <strong class='product__price' :class="'product__price--' + category">$29.95</strong>
+          <strong class='product__price' :class="'product__price--' + category" v-text='"$" + productData.price' />
         <div class="product__actions">
           <ProductAction text='Buy now' :category='category' variant='fill' />
-          <ProductAction text='Next product' :category='category' variant='border' />
+          <ProductAction text='Next product' :category='category' variant='border' @click='index < 20 ? index++ : index = 1' />
         </div>
       </div>
     </div>
@@ -88,7 +148,7 @@ export default defineComponent({
     <div class="foreground foreground--unavailable" />
     <div class='product__unavailable'>
       <span class='product__unavailable-title'>This product is unavailable to show</span>
-      <ProductAction text='Next product' category='unavailable' variant='border' />
+      <ProductAction text='Next product' category='unavailable' variant='border' @click='index < 20 ? index++ : index = 1' />
     </div>
   </div>
 </template>
@@ -96,12 +156,10 @@ export default defineComponent({
 <style>
 body {
   position: relative;
-  padding-inline: 120px;
+  padding-inline: 2rem;
   font-family: 'Inter', sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
+  padding-top: 60px;
   padding-bottom: 30px;
 }
 
@@ -130,21 +188,17 @@ body {
 .product {
   display: flex;
   overflow: auto;
-  flex-wrap: wrap;
   gap: 68px;
   justify-content: center;
+  flex-wrap: wrap;
   margin: auto;
-  padding: 50px 60px;
+  padding-block: 50px;
+  padding-inline: clamp(3rem, 2.4000rem + 2.0000vw, 4rem);
   background-color: var(--color-bg);
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 25%);
   border-radius: 10px;
   max-width: 1035px;
-}
-
-@media screen and (max-width: 1248px) {
-  .product {
-    margin-top: 50px;
-  }
+  min-height: 450px;
 }
 
 .product__unavailable {
@@ -170,19 +224,43 @@ body {
 }
 
 .product__preview {
-  min-width: 300px;
+  width: 300px;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 1248px) {
+  .product__preview {
+    width: 100%;
+    max-width: 530px;
+  }
+}
+
+.product__preview img {
+  width: 100%;
+  object-fit: contain;
+  -o-object-fit: contain;
+  object-position: center;
 }
 
 .product__preview--loading {
-  height: 375px;
+  width: 100%;
+  max-width: 300px;
   background-color: var(--color-unavailable-bg);
   animation: loading 1s alternate infinite;
 }
 
 .product__information {
-  min-width: 520px;
   display: flex;
   flex-direction: column;
+  max-width: 600px;
+  min-width: 480px;
+}
+
+@media screen and (max-width: 1248px) {
+  .product__information {
+    max-width: inherit;
+    min-width: 300px;
+  }
 }
 
 .product__heading {
@@ -200,7 +278,6 @@ body {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow-y: hidden;
-  max-width: 500px;
 }
 
 .product__title--loading {
@@ -255,8 +332,6 @@ body {
 }
 
 .product__description {
-  min-width: 200px;
-  max-width: 520px;
   font-weight: 400;
   line-height: 24px;
   color: var(--color-paragraph);
