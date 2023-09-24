@@ -1,15 +1,20 @@
 <script lang='ts'>
 import { defineComponent } from 'vue'
 import './assets/css/global.css'
+import ProductStar from './components/ProductStar.vue'
+import ProductAction from './components/ProductAction.vue'
 
 export default defineComponent({
   name: 'MainPage',
-  components: {},
+  components: { ProductStar, ProductAction },
   data () {
     return {
       isProductAvailable: true,
       category: 'men'
     }
+  },
+  mounted () {
+    document.title = 'Mens Casual Slim Fit'
   }
 })
 </script>
@@ -29,26 +34,11 @@ export default defineComponent({
             <div class="product__rating">
               <div title='Product rating' class="product__rating-text">2.9/5</div>
               <div class="product__rating-star">
-                <div
-                  class="product__star product__star--fill"
-                  :class="'product__star--' + category"
-                />
-                <div
-                  class="product__star product__star--fill"
-                  :class="'product__star--' + category"
-                />
-                <div
-                  class="product__star product__star--fill"
-                  :class="'product__star--' + category"
-                />
-                <div
-                  class="product__star product__star--fill"
-                  :class="'product__star--' + category"
-                />
-                <div
-                  class="product__star product__star--fill"
-                  :class="'product__star--' + category"
-                />
+                <ProductStar :category='category' :variant='"fill"' />
+                <ProductStar :category='category' :variant='"fill"' />
+                <ProductStar :category='category' :variant='"border"' />
+                <ProductStar :category='category' :variant='"border"' />
+                <ProductStar :category='category' :variant='"border"' />
               </div>
             </div>
           </div>
@@ -60,8 +50,8 @@ export default defineComponent({
           <hr style="width: 100%; border-color: rgba(0, 0, 0, 20%)" />
           <strong class='product__price' :class="'product__price--' + category">$29.95</strong>
         <div class="product__actions">
-          <button class="product__action product__action--fill product__action--men" :class="'product__action--' + category">Buy now</button>
-          <button class="product__action product__action--border" :class="'product__action--' + category">Next product</button>
+          <ProductAction text='Buy now' :category='category' variant='fill' />
+          <ProductAction text='Next product' :category='category' variant='border' />
         </div>
       </div>
     </div>
@@ -71,7 +61,7 @@ export default defineComponent({
     <div class="foreground foreground--unavailable" />
     <div class='product__unavailable'>
       <span class='product__unavailable-title'>This product is unavailable to show</span>
-      <button class="product__action product__action--border product__action--unavailable">Next product</button>
+      <ProductAction text='Next product' category='unavailable' variant='border' />
     </div>
   </div>
 </template>
@@ -210,31 +200,6 @@ body {
   column-gap: 2px;
 }
 
-.product__star {
-  width: 18px;
-  aspect-ratio: 1;
-  border-radius: 100%;
-  border: 1px solid transparent;
-}
-
-.product__star--men {
-  background-color: var(--color-men-primary);
-  border: 1px solid var(--color-men-primary);
-}
-
-.product__star--women {
-  background-color: var(--color-women-primary);
-  border: 1px solid var(--color-women-primary);
-}
-
-.product__star--fill {
-  border-color: transparent;
-}
-
-.product__star--border {
-  background-color: var(--color-bg);
-}
-
 .product__description {
   min-width: 200px;
   max-width: 520px;
@@ -270,51 +235,5 @@ body {
 .product__actions {
   display: flex;
   column-gap: 20px;
-}
-
-.product__action {
-  border: 1px solid transparent;
-  border-radius: 4px;
-  font-weight: 600;
-  padding: 9px 88px;
-  cursor: pointer;
-  max-width: fit-content;
-  white-space: nowrap;
-}
-
-.product__action:hover {
-  filter: brightness(.75);
-  transform: translateY(-1px);
-}
-
-.product__action:active {
-  transform: translateY(-2px);
-}
-
-.product__action--men {
-  background-color: var(--color-men-primary);
-  border-color: var(--color-men-primary);
-  color: var(--color-men-primary);
-}
-
-.product__action--women {
-  background-color: var(--color-women-primary);
-  border-color: var(--color-women-primary);
-  color: var(--color-women-primary);
-}
-
-.product__action--unavailable {
-  background-color: var(--color-unavailable-primary);
-  border-color: var(--color-unavailable-primary);
-  color: var(--color-unavailable-primary);
-}
-
-.product__action--fill {
-  border-color: transparent;
-  color: white;
-}
-
-.product__action--border {
-  background-color: transparent;
 }
 </style>
