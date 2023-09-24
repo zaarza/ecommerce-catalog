@@ -122,7 +122,7 @@ export default defineComponent({
           <div class="product__subtitle">
             <div title='Product category' class="product__category" v-text='productData.category' />
             <div class="product__rating">
-              <div title='Product rating' class="product__rating-text" v-text='productData.rating' />
+              <div title='Product rating' class="product__rating-text">{{  productData.rating + `${productData.rating < 5 ? '.' + Math.floor(Math.random() * 5) : ""}`}}</div>
               <div class="product__rating-star">
                 <ProductStar :category='category' :variant='"fill"' v-for='(rating, key, index) in productData.rating' :key='index'/>
                 <ProductStar :category='category' :variant='"border"' v-for='(rating, key, index) in (5 - productData.rating)' :key='index'/>
