@@ -6,13 +6,17 @@ export default defineComponent({
   props: {
     category: String,
     variant: String,
-    text: String
+    text: String,
+    disabled: {
+      type: Boolean,
+      default: false
+    }
   }
 })
 </script>
 
 <template>
-    <button class="product__action" :class="['product__action--' + variant, 'product__action--' + category]">{{ text }}</button>
+    <button class="product__action" :class="['product__action--' + variant, 'product__action--' + category]" :disabled='disabled'>{{ text }}</button>
 </template>
 
 <style scoped>
@@ -20,9 +24,11 @@ export default defineComponent({
   border: 1px solid transparent;
   border-radius: 4px;
   font-weight: 600;
-  padding: 9px 88px;
+  padding-block: 9px;
+  min-width: 150px;
+  width: 100%;
+  max-width: 250px;
   cursor: pointer;
-  max-width: fit-content;
   white-space: nowrap;
 }
 
@@ -42,6 +48,7 @@ export default defineComponent({
 }
 
 .product__action--loading {
+  cursor: default;
   width: 100%;
   height: 35px;
   background-color: var(--color-unavailable-bg);
