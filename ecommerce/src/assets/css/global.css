@@ -1,0 +1,13 @@
+@import url('./reset.css');
+
+:root {
+    --color-bg: #FFFFFF;
+    --color-men-bg: #D6E6FF;
+    --color-men-primary: #002772;
+    --color-women-bg: #FDE2FF;
+    --color-women-primary: #720060;
+    --color-unavailable-bg: #D8D7D7;
+    --color-unavailable-primary: #3F3F3F;
+    --color-paragraph: #1E1E1E;
+    --color-subheading: #3F3F3F;
+}
