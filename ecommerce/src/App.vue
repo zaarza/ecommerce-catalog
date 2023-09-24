@@ -9,8 +9,9 @@ export default defineComponent({
   components: { ProductStar, ProductAction },
   data () {
     return {
-      isProductAvailable: true,
-      category: 'men'
+      category: 'men',
+      productData: {},
+      isLoading: true
     }
   },
   mounted () {
@@ -20,7 +21,33 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="product" v-if='isProductAvailable'>
+  <div class="product" v-if='isLoading'>
+    <div class="foreground foreground--unavailable" />
+    <div class="product__preview product__preview--loading" />
+    <div class="product__information">
+      <div>
+        <div class="product__heading">
+          <div class="product__title product__title--loading" />
+          <div class="product__subtitle">
+            <div class="product__category product__category--loading" />
+            <div class="product__rating product__rating--loading" />
+          </div>
+        </div>
+        <hr style="border-color: rgba(0, 0, 0, 20%)" />
+      </div>
+      <div class="product__description product__description--loading" />
+      <div class='product__bottom'>
+          <hr style="width: 100%; border-color: rgba(0, 0, 0, 20%)" />
+          <div class='product__price product__price--loading' />
+        <div class="product__actions">
+          <ProductAction category='loading' />
+          <ProductAction category='loading' />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="product" v-if='productData && !isLoading'>
     <div class="foreground" :class="'foreground--' + category" />
     <div class="product__preview">
       <img src="./assets/images/product-sample.png" alt="" />
@@ -57,7 +84,7 @@ export default defineComponent({
     </div>
   </div>
 
-  <div class="product" v-else>
+  <div class="product" v-if='!productData && !isLoading'>
     <div class="foreground foreground--unavailable" />
     <div class='product__unavailable'>
       <span class='product__unavailable-title'>This product is unavailable to show</span>
@@ -146,6 +173,12 @@ body {
   min-width: 300px;
 }
 
+.product__preview--loading {
+  height: 375px;
+  background-color: var(--color-unavailable-bg);
+  animation: loading 1s alternate infinite;
+}
+
 .product__information {
   min-width: 520px;
   display: flex;
@@ -170,6 +203,13 @@ body {
   max-width: 500px;
 }
 
+.product__title--loading {
+  width: 500px;
+  height: 35px;
+  background-color: var(--color-unavailable-bg);
+  animation: loading 1s alternate infinite;
+}
+
 .product__title--men {
   color: var(--color-men-primary);
 }
@@ -180,6 +220,13 @@ body {
 
 .product__category, .product__rating-text {
   color: var(--color-subheading);
+}
+
+.product__category--loading {
+  width: 150px;
+  height: 20px;
+  background-color: var(--color-unavailable-bg);
+  animation: loading 1s alternate infinite;
 }
 
 .product__subtitle {
@@ -193,6 +240,13 @@ body {
   display: flex;
   column-gap: 5px;
   align-items: center;
+}
+
+.product__rating--loading {
+  width: 150px;
+  height: 20px;
+  background-color: var(--color-unavailable-bg);
+  animation: loading 1s alternate infinite;
 }
 
 .product__rating-star {
@@ -212,6 +266,12 @@ body {
   overflow-y: auto;
 }
 
+.product__description--loading {
+  height: 160px;
+  background-color: var(--color-unavailable-bg);
+  animation: loading 1s alternate infinite;
+}
+
 .product__bottom {
   display: flex;
   flex-direction: column;
@@ -222,6 +282,13 @@ body {
 .product__price {
   font-weight: 600;
   font-size: 26px;
+}
+
+.product__price--loading {
+  width: 120px;
+  height: 30px;
+  background-color: var(--color-unavailable-bg);
+  animation: loading 1s alternate infinite;
 }
 
 .product__price--men {

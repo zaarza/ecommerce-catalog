@@ -41,6 +41,13 @@ export default defineComponent({
   color: var(--color-men-primary);
 }
 
+.product__action--loading {
+  width: 100%;
+  height: 35px;
+  background-color: var(--color-unavailable-bg);
+  animation: loading 1s alternate infinite;
+}
+
 .product__action--women {
   background-color: var(--color-women-primary);
   border-color: var(--color-women-primary);
