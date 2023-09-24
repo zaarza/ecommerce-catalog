@@ -11,3 +11,13 @@
     --color-paragraph: #1E1E1E;
     --color-subheading: #3F3F3F;
 }
+
+@keyframes loading {
+    from {
+        opacity: 50%;
+    }
+
+    to {
+        opacity: 100%;
+    }
+}
